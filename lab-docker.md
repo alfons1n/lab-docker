@@ -139,7 +139,7 @@ Por padrão, o daemon do Docker pertence ao usuário `root`. Para não precisar 
    docker run hello-world
 
 
-## 2. Instalação do Komodo
+## 4. Instalação do Komodo
 
 estrutura centralizada em /opt/docker/.
 
