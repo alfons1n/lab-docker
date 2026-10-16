@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # Nome do serviço no Docker Compose
+  meu-webserver:
+    # Imagem oficial do Nginx. A tag 'alpine' é uma versão leve e rápida.
+    image: nginx:alpine
+
+    # Nome que o container terá ao rodar (facilita identificar no Docker)
+    container_name: nginx-simples
+
+    # Reinicia o container automaticamente caso ele falhe ou o servidor reinicie
+    restart: unless-stopped
+
+    # Mapeamento de portas: [Porta do seu Servidor/PC]:[Porta Interna do Nginx]
+    # Acede ao site no navegador digitando: http://IP_DO_SERVIDOR:8080
+    ports:
+      - "8080:80"
+
+    # Mapeamento de pastas (Volumes):
+    # Conecta a pasta local './html' no servidor à pasta onde o Nginx guarda os sites.
+    volumes:
+      - ./html:/usr/share/nginx/html:ro

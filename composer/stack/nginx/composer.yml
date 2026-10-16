@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # Nome do serviço interno dentro do ecossistema do Compose
+  webserver:
+    # Imagem oficial do Nginx. A tag 'alpine' é usada por ser extremamente leve (~10MB) e segura.
+    image: nginx:alpine
+    
+    # Nome fixo atribuído ao container em execução (facilita comandos no terminal como 'docker logs nginx_demo')
+    container_name: nginx_demo
+    
+    # Política de reinicialização: garante que o container volte a subir automaticamente se falhar ou se o host reiniciar
+    restart: unless-stopped
+    
+    # Mapeamento de portas: [Porta do Servidor Host]:[Porta Interna do Container]
+    # O uso de ${VAR:-padrão} permite configurar portas via variáveis no Komodo UI com um valor fallback
+    ports:
+      - "${HTTP_PORT:-80}:80"     # Expõe a porta HTTP principal
+      - "${HTTPS_PORT:-443}:443"  # Expõe a porta HTTPS para tráfego encriptado
+    
+    # Variáveis de ambiente injetadas dentro do container
+    environment:
+      - TZ=Europe/Lisbon # Define o fuso horário interno do container para sincronização de logs
+      
+    # Mapeamento de volumes (Bind Mounts): liga pastas do seu servidor host às pastas do container
+    # Sintaxe: [Caminho no Host]:[Caminho no Container]:[Permissão]
+    volumes:
+      # Arquivos do site (HTML/CSS/JS). 'ro' (read-only) impede que o Nginx altere os ficheiros no host
+      - ./html:/usr/share/nginx/html:ro
+      
+      # Ficheiro de configuração de virtual hosts do Nginx
+      - ./config/default.conf:/etc/nginx/conf.d/default.conf:ro
+      
+      # Armazenamento persistente de logs de acesso e erros fora do container
+      - ./logs:/var/log/nginx
+      
+    # Verificação de integridade do serviço (Healthcheck)
+    # Permite ao Komodo UI e ao Docker monitorizar se o servidor web está realmente a responder a requisições
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost/ || exit 1"]
+      interval: 15s     # Frequência de verificação
+      timeout: 5s       # Tempo limite de resposta de cada teste
+      retries: 3        # Número de falhas consecutivas para marcar o container como 'unhealthy'
+      start_period: 5s  # Período de tolerância durante o arranque inicial
+      
+    # Associação do container a uma rede isolada
+    networks:
+      - app_net
+
+# Definição das redes virtuais do Docker
+networks:
+  app_net:
+    name: nginx_app_network
+    driver: bridge # O driver 'bridge' cria uma rede privada isolada no host para os containers
