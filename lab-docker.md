@@ -137,3 +137,23 @@ Por padrão, o daemon do Docker pertence ao usuário `root`. Para não precisar 
 4. **Teste a execução do Docker sem `sudo`**:
    ```bash
    docker run hello-world
+
+
+## 2. Instalação do Komodo
+
+estrutura centralizada em /opt/docker/.
+
+Estrutura de Diretórios da Aplicação
+
+/opt/docker/
+└── elastic-monitoring/
+    ├── docker-compose.yml
+    ├── .env
+    └── config/
+        ├── logstash.yml
+        └── pipeline/
+            └── logstash.conf
+
+   
+https://komo.do/docs/setup/mongo
+
